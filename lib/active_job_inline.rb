@@ -1,10 +1,10 @@
-require "lib/active_job_inline/middlewares/rack"
-require "lib/active_job_inline/middlewares/active_job"
+require "active_job_inline/middlewares/rack"
+require "active_job_inline/middlewares/active_job"
 
-require "lib/active_job_inline/queue_adapters/inline/with_default"
-require "lib/active_job_inline/queue_adapters/inline/with_delay"
+require "active_job_inline/queue_adapters/inline/with_default"
+require "active_job_inline/queue_adapters/inline/with_delay"
 
-require "lib/active_job/queue_adapters/inline_with_delay_adapter"
+require "active_job/queue_adapters/inline_with_delay_adapter"
 
 module ActiveJobInline
   class << self
