@@ -10,7 +10,7 @@ require "active_job/queue_adapters/inline_with_delay_adapter"
 module ActiveJobInline
   class << self
     def apply(with_delays: false, &block)
-      return block.call if inline_adapter?
+      return block.call if applied?
 
       adapter = if with_delays
                   QueueAdapters::Inline::WithDelay.new
