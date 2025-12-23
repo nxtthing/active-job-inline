@@ -11,13 +11,13 @@ module ActiveJobInline
     def apply(with_delays: false, &block)
       return block.call if inline_adapter?
 
-      thread_specific_adapter = if with_delays
-                                  QueueAdapters::Inline::WithDelay.new
-                                else
-                                  default_adapter = thread_specific_adapter? ? current_adapter.default : current_adapter
-                                  QueueAdapters::Inline::WithDefault.new(default_adapter)
-                                end
-      with_queue_adapter(thread_specific_adapter, &block)
+      adapter = if with_delays
+                  QueueAdapters::Inline::WithDelay.new
+                else
+                  default_adapter = thread_specific_adapter? ? current_adapter.default : current_adapter
+                  QueueAdapters::Inline::WithDefault.new(default_adapter)
+                end
+      with_thread_specific_adapter(adapter, &block)
     end
 
     def applied?
@@ -28,7 +28,7 @@ module ActiveJobInline
 
     private
 
-    def with_queue_adapter(adapter, &block)
+    def with_thread_specific_adapter(adapter, &block)
       with_mutex_lock do
         if thread_specific_adapter?
           current_adapter.register(Thread.current, adapter)
