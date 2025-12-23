@@ -14,7 +14,6 @@ module ActiveJobInline
       thread_specific_adapter = if with_delays
                                   QueueAdapters::Inline::WithDelay.new
                                 else
-                                  current_adapter = ActiveJob::Base.queue_adapter
                                   default_adapter = thread_specific_adapter? ? current_adapter.default : current_adapter
                                   QueueAdapters::Inline::WithDefault.new(default_adapter)
                                 end
@@ -24,7 +23,7 @@ module ActiveJobInline
     def applied?
       return false unless thread_specific_adapter?
 
-      ::ActiveJob::Base.queue_adapter.inline?
+      current_adapter.inline?
     end
 
     private
@@ -32,11 +31,13 @@ module ActiveJobInline
     def with_queue_adapter(adapter, &block)
       with_mutex_lock do
         if thread_specific_adapter?
-          ::ActiveJob::Base.queue_adapter.register(Thread.current, adapter)
+          current_adapter.register(Thread.current, adapter)
         else
-          ActiveJob::Base.queue_adapter = ActiveJobInline::QueueAdapters::ThreadSpecific.new(
-            default: ::ActiveJob::Base.queue_adapter,
-            Thread.current => adapter
+          set_current_adapter(
+            QueueAdapters::ThreadSpecific.new(
+              default: current_adapter,
+              Thread.current => adapter
+            )
           )
         end
       end
@@ -45,17 +46,17 @@ module ActiveJobInline
     ensure
       with_mutex_lock do
         if thread_specific_adapter?
-          ::ActiveJob::Base.queue_adapter.after_perform
-          ::ActiveJob::Base.queue_adapter.unregister(Thread.current)
-          unless ActiveJob::Base.queue_adapter.any_specific?
-            ::ActiveJob::Base.queue_adapter = ::ActiveJob::Base.queue_adapter.default
+          current_adapter.after_perform
+          current_adapter.unregister(Thread.current)
+          unless current_adapter.any_specific?
+            set_current_adapter(::ActiveJob::Base.queue_adapter.default)
           end
         end
       end
     end
 
     def thread_specific_adapter?
-      ::ActiveJob::Base.queue_adapter.is_a?(QueueAdapters::ThreadSpecific)
+      current_adapter.is_a?(QueueAdapters::ThreadSpecific)
     end
 
     def with_mutex_lock(&)
@@ -68,6 +69,14 @@ module ActiveJobInline
         },
         &
       )
+    end
+
+    def current_adapter
+      ::ActiveJob::Base.queue_adapter
+    end
+
+    def set_current_adapter(adapter)
+      ::ActiveJob::Base.queue_adapter = adapter
     end
   end
 end

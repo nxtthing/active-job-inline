@@ -16,7 +16,7 @@ module ActiveJobInline
       protected
 
       def execute(serialized_job)
-        ActiveJob::Base.execute(serialized_job)
+        ::ActiveJob::Base.execute(serialized_job)
       end
     end
   end
