@@ -1,8 +1,8 @@
 require "active_job_inline/queue_adapters/inline/with_delay"
 
 module ActiveJobInline
-  module Middlewares
-    class Rack
+  module Extensions
+    class RackMiddleware
       def initialize(app)
         @app = app
       end

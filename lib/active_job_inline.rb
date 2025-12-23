@@ -1,6 +1,3 @@
-require "active_job_inline/middlewares/rack"
-require "active_job_inline/middlewares/active_job"
-
 require "active_job_inline/queue_adapters/thread_specific"
 require "active_job_inline/queue_adapters/inline/with_default"
 require "active_job_inline/queue_adapters/inline/with_delay"

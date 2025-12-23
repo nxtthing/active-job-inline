@@ -1,8 +1,8 @@
 require "active_job_inline/queue_adapters/inline/with_delay"
 
 module ActiveJobInline
-  module Middlewares
-    module ActiveJob
+  module Extensions
+    module ActiveJobHooks
       extend ActiveSupport::Concern
 
       included do
