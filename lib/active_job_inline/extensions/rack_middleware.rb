@@ -8,8 +8,9 @@ module ActiveJobInline
       end
 
       def call(env)
-        @app.call(env)
+        response = @app.call(env)
         ActiveJobInline::QueueAdapters::Inline::WithDelay.after_perform
+        response
       end
     end
   end
