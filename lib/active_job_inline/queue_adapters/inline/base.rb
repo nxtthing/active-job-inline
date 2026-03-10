@@ -10,6 +10,10 @@ module ActiveJobInline
           raise NotImplementedError, "enqueue_at"
         end
 
+        def enqueue_after_transaction_commit?
+          false
+        end
+
         def after_perform
           # Do Nothing by default
         end
