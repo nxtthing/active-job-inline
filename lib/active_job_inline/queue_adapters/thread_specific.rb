@@ -10,8 +10,7 @@ module ActiveJobInline
         @specific = specific.compare_by_identity
       end
 
-      delegate :enqueue, to: :adapter
-      delegate :enqueue_at, to: :adapter
+      delegate :enqueue, :enqueue_at, :enqueue_after_transaction_commit?, to: :adapter
 
       def register(thread, adapter)
         @specific[thread] = adapter
